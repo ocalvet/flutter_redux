@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-enum Actions { Increment }
+enum Actions { Increment, Decrement }
 
 int counterReducer(int state, dynamic action) {
   if (action == Actions.Increment) {
     return state + 1;
+  } else if (action == Actions.Decrement) {
+    return  state == 0 ? 0 : state - 1;
   }
-
   return state;
 }
 
@@ -66,17 +67,45 @@ class MyHomePage extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton:  new StoreConnector<int, VoidCallback>(
+      floatingActionButton:  new StoreConnector<int, ViewModel>(
         converter: (store) {
-          return () => store.dispatch(Actions.Increment);
+          return ViewModel.create(store);
         },
-        builder: (context, callback) {
-          return new FloatingActionButton(
-            onPressed: callback,
-            tooltip: 'Increment',
-            child: new Icon(Icons.add),
+        builder: (context, vm) {
+          return Column(
+            verticalDirection: VerticalDirection.down,
+            children: <Widget>[
+              FloatingActionButton(
+                onPressed: vm.increment,
+                tooltip: 'Increment',
+                child: new Icon(Icons.add),
+              ),
+              FloatingActionButton(
+                onPressed: vm.decrement,
+                tooltip: 'Decrement',
+                child: new Icon(Icons.remove),
+              ),
+            ]
           );
         }),
     );
+  }
+}
+
+class ViewModel {
+  final Store _store;
+
+  ViewModel(this._store);
+
+  void increment() {
+    this._store.dispatch(Actions.Increment);
+  }
+
+  void decrement() {
+    this._store.dispatch(Actions.Decrement);
+  }
+
+  factory ViewModel.create(Store store) {
+    return ViewModel(store);
   }
 }
