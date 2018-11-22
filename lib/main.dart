@@ -5,19 +5,21 @@ import 'package:flutter_redux/flutter_redux.dart';
 enum Actions { Increment, Decrement }
 
 int counterReducer(int state, dynamic action) {
-  if (action == Actions.Increment) {
-    return state + 1;
-  } else if (action == Actions.Decrement) {
-    return  state == 0 ? 0 : state - 1;
+  switch (action) {
+    case Actions.Increment:
+      return state + 1;
+    case Actions.Decrement:
+      return  state == 0 ? 0 : state - 1;
+    default:
+      return state;
   }
-  return state;
 }
 
 void main() {
-  final store = new Store<int>(counterReducer, initialState: 0);
+  final store = Store<int>(counterReducer, initialState: 0);
 
-  runApp(new MyApp(
-    title: 'Flutter Redux Example',
+  runApp(MyApp(
+    title: 'FlutterRedux',
     store: store
   ));
 }
@@ -25,19 +27,17 @@ void main() {
 class MyApp extends StatelessWidget {
   final Store<int> store;
   final String title;
-
   MyApp({Key key, this.store, this.title}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    return new StoreProvider<int>(
+    return StoreProvider<int>(
       store: this.store,
-      child: new MaterialApp(
+      child: MaterialApp(
         title: this.title,
-        theme: new ThemeData(
+        theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: new MyHomePage(title: 'Flutter Demo Home Page'),
+        home: MyHomePage(title: 'FlutterRedux'),
       )
     );
   }
@@ -46,47 +46,37 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   final String title;
   MyHomePage({this.title});
-
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(this.title),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(this.title),
       ),
-      body: new Center(
-        child: new Column(
+      body: Center(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            new Text('You have pushed the button this many times:'),
-            new StoreConnector<int, String>(
+            Text('You have pushed the button this many times:'),
+            StoreConnector<int, String>(
                   converter: (store) => store.state.toString(),
                   builder: (context, count) {
-                    return new Text('$count', style: Theme.of(context).textTheme.display1);
+                    return Text('$count', style: Theme.of(context).textTheme.display1);
                   }
             )
           ],
         ),
       ),
-      floatingActionButton:  new StoreConnector<int, ViewModel>(
+      floatingActionButton:  StoreConnector<int, ViewModel>(
         converter: (store) {
           return ViewModel.create(store);
         },
         builder: (context, vm) {
-          return Column(
-            verticalDirection: VerticalDirection.down,
-            children: <Widget>[
+          return 
               FloatingActionButton(
                 onPressed: vm.increment,
                 tooltip: 'Increment',
-                child: new Icon(Icons.add),
-              ),
-              FloatingActionButton(
-                onPressed: vm.decrement,
-                tooltip: 'Decrement',
-                child: new Icon(Icons.remove),
-              ),
-            ]
-          );
+                child: Icon(Icons.add),
+              );
         }),
     );
   }
@@ -94,17 +84,13 @@ class MyHomePage extends StatelessWidget {
 
 class ViewModel {
   final Store _store;
-
   ViewModel(this._store);
-
   void increment() {
     this._store.dispatch(Actions.Increment);
   }
-
   void decrement() {
     this._store.dispatch(Actions.Decrement);
   }
-
   factory ViewModel.create(Store store) {
     return ViewModel(store);
   }
