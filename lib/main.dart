@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux_example/counter_state.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 enum Actions { Increment, Decrement }
 
-int counterReducer(int state, dynamic action) {
+CounterState counterReducer(CounterState state, dynamic action) {
   switch (action) {
     case Actions.Increment:
-      return state + 1;
+      return CounterState(counter: state.counter + 1);
     case Actions.Decrement:
-      return  state == 0 ? 0 : state - 1;
+      return  state.counter == 0 ? state : CounterState(counter: state.counter - 1);
     default:
       return state;
   }
 }
 
 void main() {
-  final store = Store<int>(counterReducer, initialState: 0);
+  final store = Store<CounterState>(counterReducer, initialState: CounterState(counter: 0));
 
   runApp(MyApp(
     title: 'FlutterRedux',
@@ -25,12 +26,12 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final Store<int> store;
+  final Store<CounterState> store;
   final String title;
   MyApp({Key key, this.store, this.title}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return StoreProvider<int>(
+    return StoreProvider<CounterState>(
       store: this.store,
       child: MaterialApp(
         title: this.title,
@@ -57,8 +58,8 @@ class MyHomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text('You have pushed the button this many times:'),
-            StoreConnector<int, String>(
-                  converter: (store) => store.state.toString(),
+            StoreConnector<CounterState, String>(
+                  converter: (store) => store.state.counter.toString(),
                   builder: (context, count) {
                     return Text('$count', style: Theme.of(context).textTheme.display1);
                   }
@@ -66,7 +67,7 @@ class MyHomePage extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton:  StoreConnector<int, ViewModel>(
+      floatingActionButton:  StoreConnector<CounterState, ViewModel>(
         converter: (store) {
           return ViewModel.create(store);
         },
