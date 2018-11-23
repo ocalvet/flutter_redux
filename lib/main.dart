@@ -5,7 +5,7 @@ import 'package:redux/redux.dart';
 import 'counter_reducer.dart';
 
 void main() {
-  final store = Store<CounterState>(counterReducer, initialState: CounterState(counter: 0));
+  final store = Store<CounterState>(appReducer, initialState: CounterState(0));
   runApp(ReduxApp(
     title: 'FlutterRedux',
     store: store

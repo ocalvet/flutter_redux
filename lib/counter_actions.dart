@@ -1,1 +1,2 @@
-enum Actions { Increment, Decrement }
+class IncrementAction {}
+class DecrementAction {}
